@@ -42,11 +42,13 @@ $.fn.pjax = function( container, options ) {
     if ( event.which > 1 || event.metaKey )
       return true
 
+    var fragment = $(this).data('pjax-fragment') || null;
+
     var defaults = {
       url: this.href,
       container: $(this).attr('data-pjax'),
       clickedElement: $(this),
-      fragment: null
+      fragment: fragment
     }
 
     $.pjax($.extend({}, defaults, options))
