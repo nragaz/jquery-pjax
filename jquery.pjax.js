@@ -115,16 +115,12 @@ $.pjax = function( options ) {
       var redirect = xhr.getResponseHeader('Redirect-Location')
       
       if (redirect) {
-        console.log(redirect)
-        
-        $.pjax({
+        return $.pjax({
           url: redirect,
           container: options.container,
           fragment: options.fragment,
           timeout: options.timeout
         })
-        
-        return
       }
       
       if ( options.fragment ) {
