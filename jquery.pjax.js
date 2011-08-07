@@ -113,8 +113,7 @@ $.pjax = function( options ) {
       // If the server specified a Redirect-Location in its response,
       // call pjax again using that URL and stop handling this response
       var redirect = xhr.getResponseHeader('Redirect-Location')
-      
-      if (redirect) {
+      if ( redirect ) {
         return $.pjax({
           url: redirect,
           container: options.container,
