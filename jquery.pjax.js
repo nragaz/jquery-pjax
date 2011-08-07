@@ -109,7 +109,24 @@ $.pjax = function( options ) {
     complete: function(){
       $container.trigger('end.pjax')
     },
-    success: function(data){
+    success: function(data, status, xhr){
+      // If the server specified a Redirect-Location in its response,
+      // call pjax again using that URL and stop handling this response
+      var redirect = xhr.getResponseHeader('Redirect-Location')
+      
+      if (redirect) {
+        console.log(redirect)
+        
+        $.pjax({
+          url: redirect,
+          container: options.container,
+          fragment: options.fragment,
+          timeout: options.timeout
+        })
+        
+        return
+      }
+      
       if ( options.fragment ) {
         // If they specified a fragment, look for it in the response
         // and pull it out.
