@@ -106,7 +106,12 @@ $.pjax = function( options ) {
     error: function(){
       window.location = options.url
     },
-    complete: function(){
+    complete: function(xhr, status){
+      // Don't trigger the complete callback if a redirect is still being
+      // processed
+      if ( xhr.getResponseHeader('Redirect-Location') )
+        return
+      
       $container.trigger('end.pjax')
     },
     success: function(data, status, xhr){
@@ -114,12 +119,13 @@ $.pjax = function( options ) {
       // call pjax again using that URL and stop handling this response
       var redirect = xhr.getResponseHeader('Redirect-Location')
       if ( redirect ) {
-        return $.pjax({
+        $.pjax({
           url: redirect,
           container: options.container,
           fragment: options.fragment,
           timeout: options.timeout
         })
+        return false
       }
       
       if ( options.fragment ) {
