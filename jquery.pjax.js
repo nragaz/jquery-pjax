@@ -115,10 +115,19 @@ $.pjax = function( options ) {
       $container.trigger('end.pjax')
     },
     success: function(data, status, xhr){
-      // If the server specified a Redirect-Location in its response,
-      // call pjax again using that URL and stop handling this response
+      // If the server specified a Redirect-Location header in its response,
+      // call pjax again using that URL and stop handling this response.
+      //
+      // If the Redirect-Without-Pjax header is set, redirect the window.
       var redirect = xhr.getResponseHeader('Redirect-Location')
-      if ( redirect ) {
+        , redirectWithoutPjax = xhr.getResponseHeader('Redirect-Without-Pjax');
+      
+      if ( redirect && redirectWithoutPjax ) {
+        $container.trigger('redirect.pjax');
+        window.location = redirect
+        return false
+      } else if ( redirect ) {
+        $container.trigger('redirect.pjax');
         $.pjax({
           url: redirect,
           container: options.container,
