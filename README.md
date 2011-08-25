@@ -1,3 +1,43 @@
+This fork adds the ability to redirect a pjax request, e.g. if you want 
+to redirect to a show action from an update or create action. To redirect,
+respond with headers:
+
+  * Redirect-Location: an URL to send a new pjax request with the same options.
+  * Redirect-Without-Pjax: an URL to set as the new window.location.
+  
+In either case, a 'redirect.pjax' is triggered on the container before
+processing the redirect.
+
+To handle this transparently in Rails, use something like this in
+ApplicationController:
+
+    # instead of transparently redirecting a pjax request, send a response
+    # with the redirect-location in a header and let pjax handle it
+    def redirect_to(options={}, response_status={})
+      if pjax_request?
+        opts = {}
+
+        pjax_opts = options.is_a?(Hash) ? options : response_status
+        # i.e. :pjax => false
+        if pjax_opts.has_key?(:pjax) && !pjax_opts.delete(:pjax)
+          opts[:redirect_without_pjax] = true
+        end
+        opts[:redirect_location] = _compute_redirect_to_location(options)
+
+        head :ok, opts and return true
+      end
+
+      super
+    end
+
+    private
+
+    # detect a request sent by pjax
+    def pjax_request?
+      env['HTTP_X_PJAX'].present? || request.headers['X-PJAX'].present?
+    end
+    helper_method :pjax_request?
+
 ## pushState + ajax = pjax
 
             .--.
